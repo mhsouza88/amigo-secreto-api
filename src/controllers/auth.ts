@@ -7,17 +7,13 @@ export const login: RequestHandler = (req, res) => {
     password: z.string(),
   });
   const body = loginSchema.safeParse(req.body);
-  if (!body.success) {
-    return res.status(400).json({ error: body.error });
-  }
+  if (!body.success) return res.json({ error: "Invalid data type." });
 
-  if (auth.validatePassword(body.data.password)) {
-    return res.json({
-      token: auth.createToken(),
+  if (!auth.validatePassword(body.data.password)) {
+    return res.status(403).json({
+      error: "Access denied.",
     });
   }
 
-  res.status(403).json({
-    error: "Acesso negado, senha inválida.",
-  });
+  res.json({ token: auth.createToken() });
 };
